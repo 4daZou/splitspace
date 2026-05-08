@@ -153,4 +153,4 @@ ng serve                   # Runs on port 4200
 - **Backend:** [Render](https://splitspace-server.onrender.com) — set `MONGO_URI` environment variable  
 - **Frontend:** [Vercel](https://splitspace.vercel.app) or Netlify — update `environment.prod.ts`  
 - **App URL:** *(https://splitspace-phi.vercel.app)*  
-- **YouTube Presentation:** *(add link after recording)*
+- **YouTube Presentation:** *(https://youtu.be/Q0EJ2SXHRIY)*
