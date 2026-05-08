@@ -1,9 +1,9 @@
 /**
  * SplitSpace - controllers/expense.controller.js
- * Handles expense CRUD and auto-splitting logic.
+ * Handles expense CRUD, auto-splitting logic, and balance cleanup on delete.
  */
 
-const { Expense, Roommate } = require('../models');
+const { Expense, Roommate, Payment } = require('../models');
 
 // GET /api/expenses
 exports.getAll = async (req, res) => {
@@ -91,11 +91,37 @@ exports.update = async (req, res) => {
 };
 
 // DELETE /api/expenses/:id
+// Reverses roommate balances, deletes related payments, then deletes the expense
 exports.remove = async (req, res) => {
   try {
-    const deleted = await Expense.findByIdAndDelete(req.params.id);
-    if (!deleted) return res.status(404).json({ message: 'Expense not found' });
-    res.json({ message: 'Expense deleted successfully' });
+    const expense = await Expense.findById(req.params.id);
+    if (!expense) return res.status(404).json({ message: 'Expense not found' });
+
+    const createdBy = expense.createdBy.toString();
+
+    // 1. Reverse roommate balance adjustments for unpaid splits
+    for (const split of expense.splitAmounts) {
+      const roommateId = split.roommate.toString();
+      if (roommateId !== createdBy) {
+        if (!split.isPaid) {
+          // Unpaid: reverse the original balance changes
+          await Roommate.findByIdAndUpdate(roommateId, { $inc: { balance: +split.amount } });
+          await Roommate.findByIdAndUpdate(createdBy,  { $inc: { balance: -split.amount } });
+        } else {
+          // Paid: payment already settled, reverse the payment effect too
+          await Roommate.findByIdAndUpdate(roommateId, { $inc: { balance: +split.amount } });
+          await Roommate.findByIdAndUpdate(createdBy,  { $inc: { balance: -split.amount } });
+        }
+      }
+    }
+
+    // 2. Delete all payments linked to this expense
+    await Payment.deleteMany({ expenseId: expense._id });
+
+    // 3. Delete the expense itself
+    await Expense.findByIdAndDelete(req.params.id);
+
+    res.json({ message: 'Expense and related payments deleted successfully' });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
