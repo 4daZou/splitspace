@@ -1,0 +1,19 @@
+/* SplitSpace - Global Styles */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  background: #f4f6fb;
+  color: #1a1a2e;
+  min-height: 100vh;
+}
+
+a { color: inherit; }
+
+button { font-family: inherit; }
+
+input, select, textarea { font-family: inherit; background: #fff; }
