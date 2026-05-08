@@ -38,7 +38,7 @@ import { Roommate } from '../../interfaces/models';
             </div>
             <div class="form-group">
               <label>Move-In Date</label>
-              <input name="moveInDate" ngModel type="date" />
+              <input name="moveInDate" ngModel type="date" class="date-input" />
             </div>
           </div>
           <div class="form-actions">
@@ -141,6 +141,25 @@ import { Roommate } from '../../interfaces/models';
     .btn-edit:hover   { background: #6c8cff; color: #fff; }
     .btn-delete:hover { background: #ef4444; color: #fff; }
     .empty { color: #aaa; text-align: center; padding: 2rem; grid-column: 1/-1; }
+
+    .date-input {
+      border: 1.5px solid #e5e7eb;
+      border-radius: 8px;
+      padding: 0.6rem 0.85rem;
+      font-size: 0.9rem;
+      outline: none;
+      font-family: inherit;
+      color: #1a1a2e;
+      cursor: pointer;
+      width: 100%;
+      transition: border-color 0.2s;
+    }
+    .date-input:focus { border-color: #6c8cff; }
+    .date-input::-webkit-calendar-picker-indicator {
+      cursor: pointer;
+      opacity: 0.6;
+      filter: invert(40%) sepia(100%) saturate(500%) hue-rotate(200deg);
+    }
   `]
 })
 export class RoommatesComponent implements OnInit {
