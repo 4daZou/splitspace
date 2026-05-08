@@ -10,10 +10,20 @@ html, body {
   background: #f4f6fb;
   color: #1a1a2e;
   min-height: 100vh;
+  -webkit-text-size-adjust: 100%;
 }
 
 a { color: inherit; }
-
 button { font-family: inherit; }
-
 input, select, textarea { font-family: inherit; background: #fff; }
+
+/* Prevent horizontal overflow on mobile */
+body { overflow-x: hidden; }
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
+
+/* Better tap targets on mobile */
+button, a, select, input[type="checkbox"] {
+  -webkit-tap-highlight-color: transparent;
+}

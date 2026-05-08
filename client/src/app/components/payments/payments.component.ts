@@ -19,7 +19,6 @@ import { Payment, Expense, Roommate } from '../../interfaces/models';
       <div *ngIf="loading" class="loading">Loading...</div>
 
       <div *ngIf="!loading">
-
         <div class="form-card">
           <h3>Log a Payment</h3>
           <form (ngSubmit)="logPayment()" #payForm="ngForm">
@@ -64,6 +63,8 @@ import { Payment, Expense, Roommate } from '../../interfaces/models';
         <section class="history-section">
           <h2>Payment History</h2>
           <div *ngIf="payments.length === 0" class="empty">No payments logged yet.</div>
+
+          <!-- Desktop table -->
           <div class="payment-table" *ngIf="payments.length > 0">
             <div class="table-header">
               <span>Roommate</span>
@@ -71,17 +72,31 @@ import { Payment, Expense, Roommate } from '../../interfaces/models';
               <span>Amount</span>
               <span>Date</span>
               <span>Status</span>
-              <span>Notes</span>
+              <span class="hide-sm">Notes</span>
             </div>
             <div class="table-row" *ngFor="let p of payments">
               <div class="p-name">{{ getRoommateName(p) }}</div>
               <div class="p-expense">{{ getExpenseTitle(p) }}</div>
               <div class="p-amount">{{ p.amountPaid | currency }}</div>
               <div class="p-date">{{ p.datePaid | date:'MMM d, y' }}</div>
-              <div>
+              <div><span class="status-badge status-{{ p.paymentStatus }}">{{ p.paymentStatus }}</span></div>
+              <div class="p-notes hide-sm">{{ p.notes || '-' }}</div>
+            </div>
+          </div>
+
+          <!-- Mobile cards -->
+          <div class="mobile-payments" *ngIf="payments.length > 0">
+            <div class="payment-card" *ngFor="let p of payments">
+              <div class="pc-header">
+                <span class="pc-name">{{ getRoommateName(p) }}</span>
+                <span class="pc-amount">{{ p.amountPaid | currency }}</span>
+              </div>
+              <div class="pc-expense">{{ getExpenseTitle(p) }}</div>
+              <div class="pc-footer">
+                <span class="pc-date">{{ p.datePaid | date:'MMM d, y' }}</span>
                 <span class="status-badge status-{{ p.paymentStatus }}">{{ p.paymentStatus }}</span>
               </div>
-              <div class="p-notes">{{ p.notes || '-' }}</div>
+              <div class="pc-notes" *ngIf="p.notes">{{ p.notes }}</div>
             </div>
           </div>
         </section>
@@ -97,7 +112,7 @@ import { Payment, Expense, Roommate } from '../../interfaces/models';
               <span class="split-name">{{ getSplitName(split.roommate) }}</span>
               <span class="split-amount">{{ split.amount | currency }}</span>
               <span class="split-status" [class.paid]="split.isPaid" [class.unpaid]="!split.isPaid">
-                {{ split.isPaid ? 'Paid' : 'Unpaid' }}
+                {{ split.isPaid ? '✓ Paid' : '⏳ Unpaid' }}
               </span>
             </div>
           </div>
@@ -106,55 +121,71 @@ import { Payment, Expense, Roommate } from '../../interfaces/models';
     </div>
   `,
   styles: [`
-    .page-header { margin-bottom: 2rem; }
-    .page-header h1 { font-size: 2rem; margin: 0; color: #1a1a2e; }
-    .subtitle { color: #666; margin: 0.25rem 0 0; }
+    .page-header { margin-bottom: 1.5rem; }
+    .page-header h1 { font-size: 1.75rem; margin: 0; color: #1a1a2e; }
+    .subtitle { color: #666; margin: 0.25rem 0 0; font-size: 0.9rem; }
     .loading { text-align: center; padding: 4rem; color: #888; }
-    .form-card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 2rem; }
+    .form-card { background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
     .form-card h3 { margin: 0 0 1rem; color: #1a1a2e; }
-    .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.9rem; }
     .form-group label { font-size: 0.82rem; font-weight: 600; color: #555; }
     .form-group input, .form-group select {
       border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 0.6rem 0.85rem;
-      font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+      font-size: 0.9rem; outline: none; transition: border-color 0.2s; width: 100%; box-sizing: border-box;
     }
     .form-group input:focus, .form-group select:focus { border-color: #6c8cff; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .form-actions { display: flex; justify-content: flex-end; }
-    .btn-submit { background: #6c8cff; color: #fff; padding: 0.65rem 1.5rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; }
+    .btn-submit { background: #6c8cff; color: #fff; padding: 0.65rem 1.4rem; border-radius: 8px; border: none; font-weight: 600; cursor: pointer; }
     .btn-submit:disabled { opacity: 0.6; }
-    .history-section, .unpaid-section { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
-    .history-section h2, .unpaid-section h2 { margin: 0 0 1rem; font-size: 1.1rem; color: #1a1a2e; }
+    .history-section, .unpaid-section { background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 1.25rem; }
+    .history-section h2, .unpaid-section h2 { margin: 0 0 1rem; font-size: 1rem; color: #1a1a2e; font-weight: 700; }
+
+    /* Desktop table */
     .payment-table { border-radius: 8px; overflow: hidden; border: 1px solid #f0f0f0; }
-    .table-header {
-      display: grid; grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1.5fr;
-      padding: 0.6rem 1rem; background: #f8f9fc;
-      font-size: 0.75rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: #888;
-      border-bottom: 1px solid #eee;
-    }
-    .table-row {
-      display: grid; grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1.5fr;
-      align-items: center; padding: 0.85rem 1rem; border-bottom: 1px solid #f0f0f0;
-    }
+    .table-header { display: grid; grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1.5fr; padding: 0.6rem 1rem; background: #f8f9fc; font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #888; border-bottom: 1px solid #eee; }
+    .table-row { display: grid; grid-template-columns: 1fr 1.5fr 1fr 1fr 1fr 1.5fr; align-items: center; padding: 0.8rem 1rem; border-bottom: 1px solid #f0f0f0; }
     .table-row:last-child { border-bottom: none; }
-    .p-name { font-weight: 600; }
-    .p-amount { font-weight: 700; }
-    .p-date, .p-notes { font-size: 0.88rem; color: #666; }
-    .p-expense { font-size: 0.9rem; }
-    .status-badge { font-size: 0.75rem; padding: 0.2rem 0.6rem; border-radius: 99px; font-weight: 700; text-transform: capitalize; }
+    .p-name { font-weight: 600; font-size: 0.9rem; }
+    .p-amount { font-weight: 700; font-size: 0.9rem; }
+    .p-date, .p-notes { font-size: 0.85rem; color: #666; }
+    .p-expense { font-size: 0.88rem; }
+
+    /* Mobile payment cards */
+    .mobile-payments { display: none; flex-direction: column; gap: 0.75rem; }
+    .payment-card { background: #f8f9fc; border-radius: 10px; padding: 1rem; }
+    .pc-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.3rem; }
+    .pc-name { font-weight: 700; font-size: 0.95rem; color: #1a1a2e; }
+    .pc-amount { font-weight: 700; font-size: 1rem; color: #1a1a2e; }
+    .pc-expense { font-size: 0.88rem; color: #555; margin-bottom: 0.5rem; }
+    .pc-footer { display: flex; justify-content: space-between; align-items: center; }
+    .pc-date { font-size: 0.82rem; color: #888; }
+    .pc-notes { font-size: 0.82rem; color: #888; margin-top: 0.4rem; font-style: italic; }
+
+    .status-badge { font-size: 0.72rem; padding: 0.18rem 0.55rem; border-radius: 99px; font-weight: 700; text-transform: capitalize; }
     .status-paid    { background: #22c55e22; color: #16a34a; }
     .status-pending { background: #f59e0b22; color: #d97706; }
     .status-partial { background: #3b82f622; color: #2563eb; }
+
     .expense-breakdown { border: 1px solid #f0f0f0; border-radius: 8px; margin-bottom: 0.75rem; overflow: hidden; }
-    .expense-label { display: flex; justify-content: space-between; padding: 0.75rem 1rem; background: #f8f9fc; font-size: 0.9rem; }
+    .expense-label { display: flex; justify-content: space-between; padding: 0.65rem 1rem; background: #f8f9fc; font-size: 0.88rem; }
     .total { color: #1a1a2e; font-weight: 700; }
-    .split-row { display: flex; align-items: center; gap: 1rem; padding: 0.5rem 1rem; border-top: 1px solid #f5f5f5; }
-    .split-name { flex: 1; font-size: 0.9rem; }
-    .split-amount { font-weight: 600; font-size: 0.9rem; }
-    .split-status { font-size: 0.8rem; font-weight: 700; }
+    .split-row { display: flex; align-items: center; gap: 0.75rem; padding: 0.45rem 1rem; border-top: 1px solid #f5f5f5; flex-wrap: wrap; }
+    .split-name { flex: 1; font-size: 0.88rem; min-width: 80px; }
+    .split-amount { font-weight: 600; font-size: 0.88rem; }
+    .split-status { font-size: 0.78rem; font-weight: 700; }
     .split-status.paid   { color: #16a34a; }
     .split-status.unpaid { color: #ef4444; }
-    .empty { color: #aaa; text-align: center; padding: 2rem; }
+    .empty { color: #aaa; text-align: center; padding: 2rem; font-size: 0.9rem; }
+
+    @media (max-width: 768px) {
+      .payment-table { display: none; }
+      .mobile-payments { display: flex; }
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+    }
+    @media (max-width: 480px) {
+      .hide-sm { display: none; }
+    }
   `]
 })
 export class PaymentsComponent implements OnInit {
@@ -167,41 +198,18 @@ export class PaymentsComponent implements OnInit {
     roommateId: '', expenseId: '', amountPaid: undefined, datePaid: '', notes: ''
   };
 
-  constructor(
-    private paymentService: PaymentService,
-    private expenseService: ExpenseService,
-    private roommateService: RoommateService
-  ) {}
+  constructor(private paymentService: PaymentService, private expenseService: ExpenseService, private roommateService: RoommateService) {}
 
   ngOnInit() {
-    forkJoin({
-      payments:  this.paymentService.getAll(),
-      expenses:  this.expenseService.getAll(),
-      roommates: this.roommateService.getAll(),
-    }).subscribe({
-      next: ({ payments, expenses, roommates }) => {
-        this.payments  = payments;
-        this.expenses  = expenses;
-        this.roommates = roommates;
-        this.loading   = false;
-      },
+    forkJoin({ payments: this.paymentService.getAll(), expenses: this.expenseService.getAll(), roommates: this.roommateService.getAll() }).subscribe({
+      next: ({ payments, expenses, roommates }) => { this.payments = payments; this.expenses = expenses; this.roommates = roommates; this.loading = false; },
       error: err => { console.error(err); this.loading = false; }
     });
   }
 
-  getRoommateName(p: Payment): string {
-    const r = p.roommateId;
-    return r && typeof r === 'object' ? (r as Roommate).name : String(r);
-  }
-
-  getExpenseTitle(p: Payment): string {
-    const e = p.expenseId;
-    return e && typeof e === 'object' ? (e as Expense).title : String(e);
-  }
-
-  getSplitName(r: Roommate | string): string {
-    return r && typeof r === 'object' ? (r as Roommate).name : String(r);
-  }
+  getRoommateName(p: Payment): string { const r = p.roommateId; return r && typeof r === 'object' ? (r as Roommate).name : String(r); }
+  getExpenseTitle(p: Payment): string { const e = p.expenseId; return e && typeof e === 'object' ? (e as Expense).title : String(e); }
+  getSplitName(r: Roommate | string): string { return r && typeof r === 'object' ? (r as Roommate).name : String(r); }
 
   logPayment() {
     if (!this.newPayment.roommateId || !this.newPayment.expenseId || !this.newPayment.amountPaid) return;

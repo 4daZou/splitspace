@@ -14,6 +14,11 @@ import { Component } from '@angular/core';
       margin: 0 auto;
       padding: 2rem 1.5rem;
     }
+    @media (max-width: 768px) {
+      .main-content {
+        padding: 1rem 0.75rem;
+      }
+    }
   `]
 })
 export class AppComponent {

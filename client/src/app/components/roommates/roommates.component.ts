@@ -13,11 +13,10 @@ import { Roommate } from '../../interfaces/models';
           <p class="subtitle">Manage your household members</p>
         </div>
         <button class="btn-primary" (click)="showAddForm = !showAddForm">
-          {{ showAddForm ? '✕ Cancel' : '+ Add Roommate' }}
+          {{ showAddForm ? '✕ Cancel' : '+ Add' }}
         </button>
       </div>
 
-      <!-- Add Form -->
       <div class="form-card" *ngIf="showAddForm">
         <h3>New Roommate</h3>
         <form #addForm="ngForm" (ngSubmit)="onCreate(addForm)">
@@ -53,8 +52,6 @@ import { Roommate } from '../../interfaces/models';
 
       <div class="roommate-grid" *ngIf="!loading">
         <div class="roommate-card" *ngFor="let r of roommates">
-
-          <!-- View Mode -->
           <ng-container *ngIf="editingId !== r._id">
             <div class="card-top">
               <div class="avatar-lg">{{ getInitials(r.name) }}</div>
@@ -76,7 +73,6 @@ import { Roommate } from '../../interfaces/models';
             </div>
           </ng-container>
 
-          <!-- Edit Mode -->
           <ng-container *ngIf="editingId === r._id">
             <form #editForm="ngForm" (ngSubmit)="onUpdate(r._id!, editForm)">
               <div class="form-group">
@@ -98,67 +94,53 @@ import { Roommate } from '../../interfaces/models';
             </form>
           </ng-container>
         </div>
-
         <div *ngIf="roommates.length === 0" class="empty">No roommates yet. Add one above!</div>
       </div>
     </div>
   `,
   styles: [`
-    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 2rem; }
-    .page-header h1 { font-size: 2rem; margin: 0; color: #1a1a2e; }
-    .subtitle { color: #666; margin: 0.25rem 0 0; }
-    .btn-primary { background: #6c8cff; color: #fff; padding: 0.6rem 1.25rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.95rem; }
+    .page-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.5rem; }
+    .page-header h1 { font-size: 1.75rem; margin: 0; color: #1a1a2e; }
+    .subtitle { color: #666; margin: 0.25rem 0 0; font-size: 0.9rem; }
+    .btn-primary { background: #6c8cff; color: #fff; padding: 0.6rem 1.1rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; font-size: 0.9rem; white-space: nowrap; }
     .loading { text-align: center; padding: 4rem; color: #888; }
-
-    .form-card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
+    .form-card { background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); margin-bottom: 1.5rem; }
     .form-card h3 { margin: 0 0 1rem; color: #1a1a2e; }
-    .form-group { display: flex; flex-direction: column; gap: 0.4rem; margin-bottom: 1rem; }
+    .form-group { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.9rem; }
     .form-group label { font-size: 0.82rem; font-weight: 600; color: #555; }
     .form-group input {
       border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 0.6rem 0.85rem;
-      font-size: 0.9rem; outline: none; transition: border-color 0.2s;
+      font-size: 0.9rem; outline: none; transition: border-color 0.2s; width: 100%; box-sizing: border-box;
     }
     .form-group input:focus { border-color: #6c8cff; }
     .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     .form-actions { display: flex; justify-content: flex-end; }
     .btn-submit { background: #6c8cff; color: #fff; padding: 0.6rem 1.25rem; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
     .btn-submit:disabled { opacity: 0.6; }
-    .btn-submit-sm { background: #6c8cff; color: #fff; padding: 0.4rem 0.9rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-    .btn-cancel-sm { background: #f3f4f6; color: #555; padding: 0.4rem 0.9rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-
-    .roommate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1rem; }
-    .roommate-card { background: #fff; border-radius: 12px; padding: 1.5rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
-    .card-top { display: flex; gap: 1rem; margin-bottom: 1rem; }
-    .avatar-lg { width: 52px; height: 52px; border-radius: 50%; background: #6c8cff22; color: #6c8cff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1.1rem; flex-shrink: 0; }
-    .info h3 { margin: 0 0 0.3rem; color: #1a1a2e; }
-    .info p { margin: 0.15rem 0; font-size: 0.85rem; color: #666; }
-    .card-balance { font-weight: 700; font-size: 0.9rem; padding: 0.5rem 0.75rem; border-radius: 8px; margin-bottom: 1rem; background: #f3f4f6; text-align: center; color: #555; }
+    .btn-submit-sm { background: #6c8cff; color: #fff; padding: 0.45rem 0.9rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+    .btn-cancel-sm { background: #f3f4f6; color: #555; padding: 0.45rem 0.9rem; border-radius: 6px; border: none; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+    .roommate-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+    .roommate-card { background: #fff; border-radius: 12px; padding: 1.25rem; box-shadow: 0 2px 8px rgba(0,0,0,0.07); }
+    .card-top { display: flex; gap: 0.9rem; margin-bottom: 0.9rem; }
+    .avatar-lg { width: 48px; height: 48px; border-radius: 50%; background: #6c8cff22; color: #6c8cff; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 1rem; flex-shrink: 0; }
+    .info h3 { margin: 0 0 0.25rem; color: #1a1a2e; font-size: 1rem; }
+    .info p { margin: 0.1rem 0; font-size: 0.82rem; color: #666; }
+    .card-balance { font-weight: 700; font-size: 0.88rem; padding: 0.45rem 0.75rem; border-radius: 8px; margin-bottom: 0.9rem; background: #f3f4f6; text-align: center; color: #555; }
     .card-balance.negative { background: #ef444411; color: #ef4444; }
     .card-balance.positive { background: #22c55e11; color: #16a34a; }
     .card-actions { display: flex; gap: 0.5rem; }
-    .btn-edit   { flex: 1; background: #6c8cff22; color: #6c8cff; border: none; padding: 0.4rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
-    .btn-delete { flex: 1; background: #ef444422; color: #ef4444; border: none; padding: 0.4rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+    .btn-edit   { flex: 1; background: #6c8cff22; color: #6c8cff; border: none; padding: 0.45rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
+    .btn-delete { flex: 1; background: #ef444422; color: #ef4444; border: none; padding: 0.45rem; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85rem; }
     .btn-edit:hover   { background: #6c8cff; color: #fff; }
     .btn-delete:hover { background: #ef4444; color: #fff; }
     .empty { color: #aaa; text-align: center; padding: 2rem; grid-column: 1/-1; }
-
-    .date-input {
-      border: 1.5px solid #e5e7eb;
-      border-radius: 8px;
-      padding: 0.6rem 0.85rem;
-      font-size: 0.9rem;
-      outline: none;
-      font-family: inherit;
-      color: #1a1a2e;
-      cursor: pointer;
-      width: 100%;
-      transition: border-color 0.2s;
-    }
+    .date-input { border: 1.5px solid #e5e7eb; border-radius: 8px; padding: 0.6rem 0.85rem; font-size: 0.9rem; outline: none; font-family: inherit; color: #1a1a2e; cursor: pointer; width: 100%; box-sizing: border-box; transition: border-color 0.2s; }
     .date-input:focus { border-color: #6c8cff; }
-    .date-input::-webkit-calendar-picker-indicator {
-      cursor: pointer;
-      opacity: 0.6;
-      filter: invert(40%) sepia(100%) saturate(500%) hue-rotate(200deg);
+    .date-input::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; filter: invert(40%) sepia(100%) saturate(500%) hue-rotate(200deg); }
+
+    @media (max-width: 540px) {
+      .form-row { grid-template-columns: 1fr; gap: 0; }
+      .roommate-grid { grid-template-columns: 1fr; }
     }
   `]
 })
@@ -172,9 +154,7 @@ export class RoommatesComponent implements OnInit {
 
   constructor(private roommateService: RoommateService) {}
 
-  ngOnInit() {
-    this.loadRoommates();
-  }
+  ngOnInit() { this.loadRoommates(); }
 
   loadRoommates() {
     this.roommateService.getAll().subscribe({
@@ -195,25 +175,17 @@ export class RoommatesComponent implements OnInit {
     });
   }
 
-  startEdit(r: Roommate) {
-    this.editingId = r._id!;
-    this.editData = { name: r.name, email: r.email, phone: r.phone };
-  }
+  startEdit(r: Roommate) { this.editingId = r._id!; this.editData = { name: r.name, email: r.email, phone: r.phone }; }
 
   onUpdate(id: string, form: NgForm) {
     this.roommateService.update(id, form.value).subscribe({
-      next: (updated) => {
-        this.roommates = this.roommates.map(r => r._id === id ? updated : r);
-        this.editingId = null;
-      },
+      next: (updated) => { this.roommates = this.roommates.map(r => r._id === id ? updated : r); this.editingId = null; },
       error: err => console.error(err)
     });
   }
 
   onDelete(id: string) {
     if (!confirm('Remove this roommate?')) return;
-    this.roommateService.delete(id).subscribe(() => {
-      this.roommates = this.roommates.filter(r => r._id !== id);
-    });
+    this.roommateService.delete(id).subscribe(() => { this.roommates = this.roommates.filter(r => r._id !== id); });
   }
 }
